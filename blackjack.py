@@ -96,20 +96,20 @@ class Blackjack:
         else:
             print("\nInvalid input. Would you like to (H)it or (S)tand?", end=' ')
 
-    def dealer_hit(deck, player, dealer):
+    def dealer_hit(deck, dealer):
         dealer.draw_card(deck.deal())
         dealer.ace_value()
 
     def display_partial(player, dealer):
         print("\nDealer has: {d_card1} ? = ?".format(d_card1=dealer.cards[0]))           
-        print("Player has: {p_card1} {p_card2} = {score}".format(p_card1=player.cards[0], \
-            p_card2=player.cards[1], score=player.value))           
+        print("Player has: {p_card1} {p_card2} = {score}".format(\
+            p_card1=player.cards[0], p_card2=player.cards[1], score=player.value))           
 
     def display_all(player, dealer):
-        print("\nDealer has: {d_card1} {d_card2} = {score}".format(d_card1=dealer.cards[0], \
-            d_card2=dealer.cards[1], score=dealer.value))      
-        print("Player has: {p_card1} {p_card2} = {score}".format(p_card1=player.cards[0], \
-            p_card2=player.cards[1], score=player.value)) 
+        print("\nDealer has: {d_card1} {d_card2} = {score}".format(\
+            d_card1=dealer.cards[0], d_card2=dealer.cards[1], score=dealer.value))      
+        print("Player has: {p_card1} {p_card2} = {score}".format(\
+            p_card1=player.cards[0], p_card2=player.cards[1], score=player.value)) 
 
     def check_valid_game(player, dealer):
         if player.value < 21 and dealer.value < 21:
@@ -151,9 +151,10 @@ class Blackjack:
             print(s)
         exit(0)
 
-    def player_busts(player, dealer):
-        print("\nPlayer has: {p_card1} {p_card2} {p_card3} = {score}".format(p_card1=player.cards[0], \
-            p_card2=player.cards[1], p_card3=player.cards[2], score=player.value)) 
+    def player_busts(player):
+        print("\nPlayer has: {p_card1} {p_card2} {p_card3} = {score}".format(\
+            p_card1=player.cards[0],p_card2=player.cards[1], p_card3=player.cards[2],\
+            score=player.value)) 
         print("Player busts with {score}".format(score=player.value))
         print("Dealer wins")
         exit(0)
@@ -177,8 +178,9 @@ class Blackjack:
         exit(0)
 
     def dealer_busts(player, dealer):
-        print("\nDealer has: {d_card1} {d_card2} {d_card3} = {score}".format(d_card1=dealer.cards[0], \
-            d_card2=dealer.cards[1], d_card3=dealer.cards[2], score=dealer.value)) 
+        print("\nDealer has: {d_card1} {d_card2} {d_card3} = {score}".format(\
+            d_card1=dealer.cards[0], d_card2=dealer.cards[1], d_card3=dealer.cards[2],\
+            score=dealer.value)) 
         print("Dealer busts with {score}".format(score=dealer.value))
         print("Player wins")
         exit(0)
@@ -215,7 +217,7 @@ def main():
                 if player.value == 21:
                     Blackjack.player_wins(player, dealer, True)
                 if player.value > 21:
-                    Blackjack.player_busts(player, dealer)
+                    Blackjack.player_busts(player)
 
         # If Player chooses Stand and hasn't busted or won, Dealer plays
         while dealer.value < 17:
@@ -229,7 +231,7 @@ def main():
                 print("\n")
                 break
             else:
-                Blackjack.dealer_hit(deck, player, dealer)
+                Blackjack.dealer_hit(deck, dealer)
                 print("Dealer hits")
             valid_game = Blackjack.check_valid_game(player, dealer)
             if not valid_game:
