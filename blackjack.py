@@ -1,10 +1,12 @@
 import random
 
-values = {'1':1, '2':2, '3':3, '4':4, '5':5, '6':6, '7':7, '8':8, '9':9, '10':10, \
+# Corresponding card and its value
+values = {'2':2, '3':3, '4':4, '5':5, '6':6, '7':7, '8':8, '9':9, '10':10, \
     'J': 10, 'Q': 10, 'K':10, 'A': 11}
 
 # Whether the game is active (not in stand).
-playing = True
+is_playing = True
+# Whether the current scoring is valid (no player has busted)
 valid_game = True
 
 class Deck:
@@ -20,7 +22,6 @@ class Deck:
         for _ in range(4):
             for card in values.keys():
                 self.deck.append(card)
-        # self.deck = [[card for card in values.keys()] for _ in range(4)]
 
     def shuffle(self):
         random.shuffle(self.deck)
@@ -54,17 +55,29 @@ class Hand:
             self.aces += 1
     
     def ace_value(self):
+        """
+        Aces can be 1 point or 11 points. The exact score of Ace is optimized
+        based on the total score. If Ace-11 leads to a bust, then the value of
+        Ace is 1. If Ace-11 does not lead to a bust, it then represents 11.
+        """
         while self.value > 21 and self.aces:
             self.value -= 10
             self.aces -= 1
 
 class Blackjack:
     def player_hit(deck, hand, dealer):
+        """
+        If player chooses to Hit, draw a card from the deck and adjust for 
+        the Ace value if Ace is present.
+        """
         hand.draw_card(deck.deal())
         hand.ace_value()
 
     def hit_or_stand(deck, hand, dealer):
-        global playing
+        """
+        Prompts the player with the option of Hit or Stand.
+        """
+        global is_playing
 
         print("Would you like to (H)it or (S)tand?", end=' ')
         option = input()
@@ -79,16 +92,11 @@ class Blackjack:
             print("\nPlayer stands with: {p_card1} {p_card2} = {score}".format(\
                 p_card1=hand.cards[0], p_card2=hand.cards[1], score=hand.value))
             print("\n")
-            playing = False
+            is_playing = False
         else:
             print("\nInvalid input. Would you like to (H)it or (S)tand?", end=' ')
 
     def dealer_hit(deck, player, dealer):
-        s = 'Dealer has: '
-        for i in range(len(dealer.cards)):
-            s += str(dealer.cards[i])
-            s += ' '
-        print(s)
         dealer.draw_card(deck.deal())
         dealer.ace_value()
 
@@ -102,7 +110,6 @@ class Blackjack:
             d_card2=dealer.cards[1], score=dealer.value))      
         print("Player has: {p_card1} {p_card2} = {score}".format(p_card1=player.cards[0], \
             p_card2=player.cards[1], score=player.value)) 
-        # add dealer hits ...
 
     def check_valid_game(player, dealer):
         if player.value < 21 and dealer.value < 21:
@@ -123,7 +130,7 @@ class Blackjack:
             Blackjack.tie()
     
     def tie():
-        print("\nTie")
+        print("Tie")
         exit(0)
 
     def player_wins(player, dealer, blackjack):
@@ -199,32 +206,36 @@ def main():
         Blackjack.display_partial(player, dealer)
 
         # Player continues to play the card until Player has stood, won (score==21), or busted.
-        while playing and valid_game:
+        while is_playing and valid_game:
             # Promp Player to choose Hit or Stand playing options.
             Blackjack.hit_or_stand(deck, player, dealer)
 
-            if playing:
+            # If Player chooses Hit 
+            if is_playing:
                 if player.value == 21:
                     Blackjack.player_wins(player, dealer, True)
                 if player.value > 21:
                     Blackjack.player_busts(player, dealer)
 
-        # If Player hasn't busted or won, Dealer plays
+        # If Player chooses Stand and hasn't busted or won, Dealer plays
         while dealer.value < 17:
-            Blackjack.dealer_hit(deck, player, dealer)
-            print(deck.deck[-1])
-            if dealer.value + values[deck.deck[-1]] >= 17:
+            s = 'Dealer has: '
+            for i in range(len(dealer.cards)):
+                s += str(dealer.cards[i])
+                s += ' '
+            print(s)
+            if dealer.value >= 17:
                 print("Dealer stands")
                 print("\n")
                 break
             else:
+                Blackjack.dealer_hit(deck, player, dealer)
                 print("Dealer hits")
             valid_game = Blackjack.check_valid_game(player, dealer)
             if not valid_game:
                 Blackjack.check_winner(player, dealer)
             
         Blackjack.check_winner(player, dealer)
-
 
 if __name__ == '__main__':
     main()
